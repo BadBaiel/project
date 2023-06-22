@@ -35,11 +35,29 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    DIRECTION_CHOICES = (
+        ('Backend', 'Backend'),
+        ('Frontend', 'Frontend'),
+        ('UX/UI', 'UX/UI'),
+        ('Android', 'Android'),
+        ('IOS', 'IOS')
+    )
+
+    MONTH_CHOICES = (
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('4', '4'),
+        ('5', '5'),
+        ('6', '6'),
+        ('7', '7')
+    )
+
     email = models.EmailField(max_length=255, unique=True, db_index=True)
     username = models.CharField(max_length=255, unique=True, db_index=True)
     number = models.CharField(max_length=255, unique=True, db_index=True)
-    directions = models.CharField(max_length=255)
-    month = models.CharField(max_length=255)
+    directions = models.CharField(choices=DIRECTION_CHOICES, max_length=255)
+    month = models.CharField(choices=MONTH_CHOICES, max_length=255)
     password = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

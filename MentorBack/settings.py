@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'apps.mentors',
     'drf_yasg',
     'rest_framework_simplejwt',
-
 ]
 
 JAZZMIN_SETTINGS = {

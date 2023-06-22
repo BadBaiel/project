@@ -10,14 +10,16 @@ from rest_framework.response import Response
 from django.http import HttpResponseRedirect
 from apps.users.models import User
 from rest_framework import status
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import MentorFilter
 
 
 class MentorListAPIView(ListAPIView):
     queryset = Mentor.objects.filter(is_active=True)
     serializer_class = MentorListsSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (IsAuthenticated, )
-
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = MentorFilter
     # def post(self, request, pk, *args, **kwargs):
     #     user = User.objects.get(id=pk)
     #     serializer = MentorSerializer(data=request.data)
@@ -35,11 +37,14 @@ class MentorListAPIView(ListAPIView):
     #                                    employment=employment, directions=directions, month=month)
     #     mentor.skills.set(skills)
     #     return Response(data=MentorSerializer(mentor).data)
+
+
 class MentorCreateAPIView(CreateAPIView):
     queryset = Mentor.objects.filter(is_active=True)
     serializer_class = MentorSerializer
     pagination_class = PageNumberPagination
     permission_classes = (IsAuthenticated, )
+
 
 class MentorDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Mentor.objects.filter(is_active=True)
