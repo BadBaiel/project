@@ -30,7 +30,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'number']
+        fields = ['id', 'username', 'email', 'password', 'number', 'directions', 'month']
 
     def validate(self, attrs):
         # first_name = attrs.get('first_name', '')
@@ -216,11 +216,13 @@ class LogOutSerializer(serializers.Serializer):
 class PersonalProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email', 'username', 'number')
+        fields = ('email', 'username', 'number', 'directions', 'month')
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['username'] = instance.username
         repr['email'] = instance.email
         repr['number'] = instance.number
+        repr['directions'] = instance.directions
+        repr['month'] = instance.month
         return repr

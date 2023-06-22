@@ -19,8 +19,27 @@ class MentorSerializer(WritableNestedModelSerializer, serializers.ModelSerialize
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     skills = TagSerializer(many=True)
     employment = Employment()
+    group = serializers.CharField(write_only=True)
+    about_me = serializers.CharField(write_only=True)
+    skills = serializers.CharField(write_only=True)
+    employment = serializers.CharField(write_only=True)
 
     class Meta:
         model = Mentor
-        fields = ['id', 'direction', 'month', 'group', 'name', 'about_me', 'contact', 'skills', 'employment', 'user']
+        fields = ['id', 'group', 'name', 'about_me', 'directions', 'month', 'contact', 'skills', 'employment', 'user',
+                  'likes_count', 'dislikes_count', 'students_count']
+
+
+class MentorDetailSerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    skills = TagSerializer(many=True)
+    employment = Employment()
+
+    class Meta:
+        model = Mentor
+        fields = ['id', 'group', 'name', 'about_me', 'directions', 'month', 'contact', 'skills', 'employment', 'user',
+                  'likes_count', 'dislikes_count', 'students_count']
+
+
+
 

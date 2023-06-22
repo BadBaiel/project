@@ -25,28 +25,9 @@ class Employment(models.Model):
 
 
 class Mentor(models.Model):
-    DIRECTION_CHOICES = (
-        ('Backend', 'Backend'),
-        ('Frontend', 'Frontend'),
-        ('UX/UI', 'UX/UI'),
-        ('Android', 'Android'),
-        ('IOS', 'IOS')
-    )
-
-    MONTH_CHOICES = (
-        ('1', '1'),
-        ('2', '2'),
-        ('3', '3'),
-        ('4', '4'),
-        ('5', '5'),
-        ('6', '6'),
-        ('7', '7')
-    )
-
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=False, blank=True)
     image = models.ImageField(blank=True, upload_to='mentors/', default='mentors/default.jpg')
-    direction = models.CharField(choices=DIRECTION_CHOICES, max_length=10)
-    month = models.CharField(max_length=5, choices=MONTH_CHOICES)
     group = models.CharField(max_length=20)
     name = models.CharField(max_length=15)
     about_me = models.TextField()
@@ -55,7 +36,28 @@ class Mentor(models.Model):
     employment = models.ForeignKey(Employment, on_delete=models.CASCADE)
     time_create = models.DateTimeField(auto_now_add=True, null=True)
     time_update = models.DateTimeField(auto_now=True, null=True)
-    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    # user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    directions = models.CharField(max_length=255)
+    month = models.CharField(max_length=255)
+    likes = models.ManyToManyField(User, blank=True, related_name='likes')
+    dislikes = models.ManyToManyField(User, blank=True, related_name='dislikes')
+
+    # def raiting(self):
+    #     likes_list = [i.likes for i in self.likes.all()]
+    #     return round(sum(likes_list) / len(likes_list), 2)
+
+
+    @property
+    def likes_count(self):
+        return self.likes.count()
+
+    @property
+    def dislikes_count(self):
+        return self.dislikes.count()
+
+    @property
+    def students_count(self):
+        return self.dislikes_count + self.likes_count
 
     class Meta:
         verbose_name = 'Mentor'
