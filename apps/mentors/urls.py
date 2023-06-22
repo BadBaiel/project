@@ -4,7 +4,8 @@ from django.urls import path, include
 
 
 urlpatterns = [
-    path('mentor/', views.MentorAPIView.as_view()),
+    path('mentor/', views.MentorListAPIView.as_view()),
+    path('mentor/create/', views.MentorCreateAPIView.as_view()),
     path('mentor/<int:pk>/', views.MentorDetailAPIView.as_view()),
 ]
 
