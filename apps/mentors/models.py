@@ -1,8 +1,6 @@
-# from django.contrib.auth.models import User
 from django.db import models
 from static.image import *
 from apps.users.models import User
-
 
 class Skills(models.Model):
     text = models.CharField(max_length=25)
@@ -45,6 +43,10 @@ class Mentor(models.Model):
     @property
     def likes_count(self):
         return self.likes.count()
+
+    #@classmethod
+    #def get_mentors_by_rating(cls):
+    #    return cls.objects.annotate(likes_count=models.Count('likes')).order_by('-likes_count')
 
     @property
     def dislikes_count(self):

@@ -127,24 +127,8 @@ class LogOutView(generics.GenericAPIView):
 class PersonalProfileView(APIView):
     serializer_class = PersonalProfileSerializer
 
-    # def post(self, request, *args, **kwargs):
-    #     user = get_object_or_404(User, pk=request.user.pk)
-    #     serializer = self.get_serializer(data=request.data)
-    #
-    #     if serializer.is_valid():
-    #         user.profile = serializer.save()
-    #         return Response(PersonalProfileSerializer(user.profile))
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def get(self, request):
         snippets = User.objects.filter(email=request.user)
         serializer = PersonalProfileSerializer(snippets, many=True)
 
         return Response(serializer.data)
-
-    # def put(self, request):
-    # user = User.objects.filter(email=request.user)
-    # serializer = PersonalProfileSerializer(user, data=request.data)
-    # if serializer.is_valid():
-    #     serializer.save()
-    #     return Response(serializer.data)
-    # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

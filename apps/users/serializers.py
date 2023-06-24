@@ -1,4 +1,3 @@
-import re
 from django.utils.encoding import smart_str, DjangoUnicodeDecodeError, force_str
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib import auth
@@ -6,35 +5,25 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
-from .registration_validators import validate_number
 from django.contrib.auth import password_validation
-from rest_framework import serializers, exceptions, status, generics
+from rest_framework import serializers, exceptions, status
 from .models import User
 from django.utils.http import urlsafe_base64_decode
-from django.db.utils import IntegrityError
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=30, min_length=6,
                                      help_text=password_validation.password_validators_help_texts(), write_only=True,
                                      style={'input_type': 'password'})
-    # first_name = serializers.CharField(max_length=30, min_length=2,
-    #                                    help_text='Firstname should contain only alphanumeric characters')
-    # last_name = serializers.CharField(max_length=30, min_length=2,
-    #                                   help_text='Lastname should contain only alphanumeric characters')
     email = serializers.EmailField(max_length=30, min_length=5,
                                    help_text='Username should contain only alphanumeric characters')
-    number = serializers.CharField(max_length=9,
-                                   help_text=['Numbers length is should be 9', 'Number should contain only digits'])
     username = serializers.CharField(max_length=30, min_length=2)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'number', 'directions', 'month']
+        fields = ['id', 'username', 'email', 'password', 'directions', 'month']
 
     def validate(self, attrs):
-        # first_name = attrs.get('first_name', '')
-        # last_name = attrs.get('last_name', '')
         username = attrs.get('username', '')
         email = attrs.get('email', '')
         validate = ('username', username)
@@ -50,14 +39,6 @@ class RegisterSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(f'This {value[0]}: {value[2]} is not available, please write new one',
                                                   400)
         return super().validate(attrs)
-
-    def validate_number(self, number):
-        try:
-            validate_number(number)
-        except exceptions.ValidationError as error:
-            raise serializers.ValidationError(f'error: {error.get_codes()}')
-        return number
-
     def validate_password(self, password):
         errors = {}
         try:
@@ -70,15 +51,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop('password', '')
-        number = validated_data.pop('number', '')
         user = self.Meta.model(**validated_data)
         if password:
             user.set_password(password)
-        try:
-            user.number = f'+996{number}'
             user.save()
-        except IntegrityError:
-            raise serializers.ValidationError(f'This number: {number} is not available, please write new one')
         return user
 
 
@@ -121,7 +97,6 @@ class LoginSerializer(serializers.ModelSerializer):
         return {
             'email': user.email,
             'username': user.username,
-            'number': user.number,
             'tokens': user.tokens(),
         }
 
@@ -216,13 +191,12 @@ class LogOutSerializer(serializers.Serializer):
 class PersonalProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email', 'username', 'number', 'directions', 'month')
+        fields = ('email', 'username', 'directions', 'month')
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['username'] = instance.username
         repr['email'] = instance.email
-        repr['number'] = instance.number
         repr['directions'] = instance.directions
         repr['month'] = instance.month
         return repr

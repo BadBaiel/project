@@ -2,20 +2,16 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView, CreateAPIView
 from .models import Mentor
 from .serializers import MentorSerializer, MentorDetailSerializer, MentorListsSerializer
-from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOrReadOnly
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpResponseRedirect
-from apps.users.models import User
-from rest_framework import status
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import MentorFilter
-
+from django.db.models import Count
 
 class MentorListAPIView(ListAPIView):
-    queryset = Mentor.objects.filter(is_active=True)
+    queryset = Mentor.objects.filter(is_active=True).annotate(like_count=Count('likes')).order_by('-like_count')
     serializer_class = MentorListsSerializer
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, )
