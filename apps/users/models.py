@@ -63,7 +63,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
     is_verified = models.BooleanField(default=False, help_text='Email activated')
-    is_staff = models.BooleanField(default=False, help_text='Сотрудник')
+    is_staff = models.BooleanField(default=False, help_text='Работник')
     is_superuser = models.BooleanField(default=False, help_text='админ')
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'number', 'directions', 'month']

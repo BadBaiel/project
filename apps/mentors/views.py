@@ -20,30 +20,40 @@ class MentorListAPIView(ListAPIView):
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = MentorFilter
-    # def post(self, request, pk, *args, **kwargs):
-    #     user = User.objects.get(id=pk)
-    #     serializer = MentorSerializer(data=request.data)
-    #     if not serializer.is_valid():
-    #         return Response(data={"errors": serializer.errors}, status=status.HTTP_406_NOT_ACCEPTABLE)
-    #     username = serializer.validated_data.get('username')
-    #     group = serializer.validated_data.get('group')
-    #     about_me = serializer.validated_data.get('about_me')
-    #     contact = serializer.validated_data.get('contact')
-    #     skills = serializer.validated_data.get('skills')
-    #     employment = serializer.validated_data.get('employment')
-    #     directions = Mentor.objects.filter(data=request.user.directions)
-    #     month = Mentor.objects.filter(data=request.user.month)
-    #     mentor = Mentor.objects.create(username=username, group=group, about_me=about_me, contact=contact, skills=skills,
-    #                                    employment=employment, directions=directions, month=month)
-    #     mentor.skills.set(skills)
-    #     return Response(data=MentorSerializer(mentor).data)
 
 
 class MentorCreateAPIView(CreateAPIView):
     queryset = Mentor.objects.filter(is_active=True)
-    serializer_class = MentorSerializer
     pagination_class = PageNumberPagination
     permission_classes = (IsAuthenticated, )
+
+    def post(self, request, format=None):
+        user = request.user  # Получаем текущего пользователя
+
+        mentor_data = {
+            'user': user.id,
+            'directions': user.directions,
+            'month': user.month,
+            'group': request.data['group'],
+            'name': request.data['name'],
+            'contact': request.data['contact'],
+            'about_me': request.data['about_me'],
+            'skills': request.data['skills'],
+            'employment': request.data['employment']
+        }
+
+        serializer = MentorSerializer(data=mentor_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+
+        return Response(serializer.errors, status=400)
+
+    # def post(self, request, *args, **kwargs):
+    #     serializer_class = MentorSerializer
+    #     serializer_data = serializer_class.validated_data
+    #     serializer_data['user'] = request.user.id
+    #     serializer_class.save()
 
 
 class MentorDetailAPIView(RetrieveUpdateDestroyAPIView):

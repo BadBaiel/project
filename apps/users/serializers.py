@@ -226,3 +226,9 @@ class PersonalProfileSerializer(serializers.ModelSerializer):
         repr['directions'] = instance.directions
         repr['month'] = instance.month
         return repr
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('directions', 'month')

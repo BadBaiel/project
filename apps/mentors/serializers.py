@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Mentor, Skills, Employment
 from drf_writable_nested import WritableNestedModelSerializer
+from apps.users.models import User
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -16,24 +17,30 @@ class Employment(serializers.ModelSerializer):
 
 
 class MentorSerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    # user_id = serializers.IntegerField()
+
     skills = TagSerializer(many=True)
     employment = Employment()
-    group = serializers.CharField(write_only=True)
-    about_me = serializers.CharField(write_only=True)
-    # skills = serializers.CharField(write_only=True)
-    # employment = serializers.CharField(write_only=True)
 
     class Meta:
         model = Mentor
-        fields = ['id', 'group', 'name', 'directions', 'month', 'contact', 'about_me', 'skills', 'employment', 'user',
+        fields = ['id', 'group', 'name', 'contact', 'directions', 'month', 'about_me', 'skills', 'employment', 'user',
                   'likes_count', 'dislikes_count', 'students_count']
+
+        def create(self, validated_data):
+            user_data = self.context['request'].user  # Извлекаем данные пользователя из запроса
+
+            validated_data['user'] = user_data
+            validated_data['directions'] = user_data.directions
+            validated_data['month'] = user_data.month
+
+            return super().create(validated_data)
+
 
 
 class MentorListsSerializer(WritableNestedModelSerializer, serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    # skills = serializers.CharField(write_only=True)
-    # employment = serializers.CharField(write_only=True)
+
 
     class Meta:
         model = Mentor
